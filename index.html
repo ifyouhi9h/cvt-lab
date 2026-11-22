@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f8fafc" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="CVT Lab v2.5" />
+  <title>CVT Lab v2.5 · Simulasi Kirian CVT</title>
+  <!-- Favicon SVG Kustom Pulley CVT -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ccircle cx='32' cy='32' r='19' fill='none' stroke='%23ffffff' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='7' fill='%23ffffff'/%3E%3Ccircle cx='32' cy='18' r='2.5' fill='%23ffffff'/%3E%3Ccircle cx='44' cy='25' r='2.5' fill='%23ffffff'/%3E%3Ccircle cx='44' cy='39' r='2.5' fill='%23ffffff'/%3E%3Ccircle cx='32' cy='46' r='2.5' fill='%23ffffff'/%3E%3Ccircle cx='20' cy='39' r='2.5' fill='%23ffffff'/%3E%3Ccircle cx='20' cy='25' r='2.5' fill='%23ffffff'/%3E%3C/svg%3E" />
+  <link id="apple-icon" rel="apple-touch-icon" href="" />
+  <link id="web-manifest" rel="manifest" href="" />
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --sub: #f8fafc;
+      --input-bg: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --body: #475569;
+      --muted: #64748b;
+      --blue: #2563eb;
+      --blue-soft: #eff6ff;
+      --red: #dc2626;
+      --green: #16a34a;
+      --purple: #7c3aed;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: max(20px, env(safe-area-inset-top)) 14px 40px;
+      font-variant-numeric: tabular-nums;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 1. Header */
+    header {
+      padding: 8px 2px 8px;
+    }
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.62rem;
+      font-weight: 800;
+      letter-spacing: 0.015em;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.035em;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border: 1px solid #bfdbfe;
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+    .sub-title {
+      font-size: 0.82rem;
+      letter-spacing: 0.015em;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    /* Card Base */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
+    }
+    .kicker {
+      display: block;
+      font-size: 0.69rem;
+      font-weight: 700;
+      letter-spacing: 0.055em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    /* Dropdown & Controls */
+    .select-box {
+      width: 100%;
+      appearance: none;
+      background-color: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 34px 10px 12px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 11px center;
+      cursor: pointer;
+    }
+    .select-box:focus {
+      outline: 2px solid #93c5fd;
+      border-color: var(--blue);
+      background-color: #ffffff;
+    }
+
+    .weight-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+
+    /* Segmented Controls */
+    .seg {
+      display: grid;
+      gap: 4px;
+      background: var(--input-bg);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .seg-2 { grid-template-columns: repeat(2, 1fr); }
+    .seg-load {
+      height: 42px;
+      align-items: stretch;
+    }
+    .seg-btn {
+      border: none;
+      background: transparent;
+      color: var(--body);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s, color 0.15s;
+    }
+    .seg-btn.active {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Kondisi Beban */
+    .load-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: end;
+    }
+    .load-col {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .mini-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.76rem;
+      margin-bottom: 5px;
+      gap: 4px;
+    }
+    .mini-row span:first-child,
+    .mini-row label:first-child {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .mini-row .hint {
+      font-size: 0.69rem;
+      white-space: nowrap;
+    }
+    .extra-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.78rem;
+    }
+    .hidden { display: none !important; }
+
+    /* Stepper Input with Right Vertical Up/Down Buttons */
+    .stepper {
+      display: flex;
+      align-items: stretch;
+      height: 42px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .stepper:focus-within {
+      border-color: var(--blue);
+      background: #ffffff;
+      box-shadow: 0 0 0 2px #dbeafe;
+    }
+    .stepper input {
+      width: 100%;
+      min-width: 0;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-family: inherit;
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--text);
+      padding: 0 6px;
+      outline: none;
+    }
+    .spin-col {
+      display: flex;
+      flex-direction: column;
+      width: 30px;
+      border-left: 1px solid var(--border);
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+    .spin-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--body);
+      font-size: 0.56rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .spin-btn:first-child {
+      border-bottom: 1px solid var(--border);
+    }
+    .spin-btn:active {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    /* Data Standar List */
+    .spec-list {
+      display: flex;
+      flex-direction: column;
+    }
+    .spec-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--input-bg);
+      font-size: 0.82rem;
+    }
+    .spec-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .spec-lbl { color: var(--body); }
+    .spec-val { font-weight: 700; color: var(--text); text-align: right; }
+
+    /* CVT Setting Grid */
+    .set-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .set-lbl {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.76rem;
+      margin-bottom: 4px;
+      gap: 4px;
+    }
+    .set-lbl span:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+    .set-lbl span:last-child { font-size: 0.69rem; color: var(--muted); white-space: nowrap; }
+
+    .reset-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--sub);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+    .reset-btn:hover {
+      background: var(--input-bg);
+      border-color: #cbd5e1;
+    }
+    .reset-btn:active {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: #93c5fd;
+    }
+
+    /* Warning Card */
+    .warn-card {
+      border-left: 3px solid var(--blue);
+    }
+    .warn-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+    }
+    .warn-text {
+      font-size: 0.79rem;
+      color: var(--body);
+      line-height: 1.5;
+    }
+    .warn-dyn {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Chart & Unified Vertical List Panels */
+    .canvas-box {
+      width: 100%;
+      height: 230px;
+      margin-top: 10px;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--body);
+      margin-top: 8px;
+    }
+    .leg-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .swatch {
+      width: 12px;
+      height: 3px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .caption {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Unified Soft Slate List Container */
+    .list-panel {
+      background: var(--sub);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .list-row {
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .list-row:first-child {
+      padding-top: 2px;
+    }
+    .list-row:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+    .row-title {
+      font-size: 0.81rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .row-main {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+    .row-main.lg {
+      font-size: 1.04rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .row-sub {
+      font-size: 0.74rem;
+      color: var(--body);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    .row-note {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--blue);
+      margin-top: 2px;
+    }
+    .panel-foot {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* Hasil Header & Summary */
+    .res-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .char-badge {
+      font-size: 0.71rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      border: 1px solid #bfdbfe;
+      white-space: nowrap;
+    }
+    .summary-p {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--body);
+      line-height: 1.55;
+    }
+
+    /* Sumber Data & Disclaimer */
+    .disc-section {
+      margin-top: 10px;
+    }
+    .disc-section:first-of-type {
+      margin-top: 4px;
+    }
+    .disc-sub {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .disc-list {
+      padding-left: 16px;
+      font-size: 0.76rem;
+      color: var(--body);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      line-height: 1.5;
+    }
+
+    /* Bottom Credit Footer */
+    footer.credit {
+      text-align: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      padding: 8px 0 4px;
+    }
+
+    /* Dynamic Delta Colors: Naik = Biru, Minus = Merah, Normal = Hijau */
+    .c-up { color: var(--blue) !important; }
+    .c-down { color: var(--red) !important; }
+    .c-flat { color: var(--green) !important; }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 1. HEADER -->
+    <header>
+      <div class="title-row">
+        <h1>CVT Lab</h1>
+        <span class="badge">v2.5</span>
+      </div>
+      <p class="sub-title">Simulasi kirian CVT · ECU standar · Estimasi performa</p>
+    </header>
+
+    <!-- 2. KARTU 1: PILIH MOTOR (Urutan: Yamaha, Honda, Suzuki, Vespa Matic, TVS) -->
+    <section class="card" aria-label="Pilihan Motor">
+      <label for="motor-select" class="kicker">PILIH MOTOR</label>
+      <select id="motor-select" class="select-box">
+        <optgroup label="Yamaha">
+          <option value="mio_sporty">Mio Sporty / Smile (115cc)</option>
+          <option value="mio_j">Mio J / Soul GT 115</option>
+          <option value="mio_m3">Mio M3 / Z / Soul GT 125</option>
+          <option value="fino_karbu">Fino Karbu (115cc)</option>
+          <option value="fino_fi">Fino FI 115</option>
+          <option value="fino_125">Fino 125 Blue Core</option>
+          <option value="xride_115">X-Ride 115</option>
+          <option value="xride_125">X-Ride 125</option>
+          <option value="gear_125">Gear 125</option>
+          <option value="fazzio_125">Fazzio 125 Hybrid</option>
+          <option value="filano_125">Grand Filano 125 Hybrid</option>
+          <option value="nmax_old">NMAX 155 Old (Gen 1)</option>
+          <option value="nmax_new">NMAX 155 New / Connected / Turbo</option>
+          <option value="aerox_old">Aerox 155 Old (Gen 1)</option>
+          <option value="aerox_new">Aerox 155 New / Connected</option>
+        </optgroup>
+        <optgroup label="Honda">
+          <option value="beat_karbu">BeAT Karbu / FI (110cc)</option>
+          <option value="beat_esp">BeAT eSP / Deluxe (110cc)</option>
+          <option value="beat_street">BeAT Street eSP / New (110cc)</option>
+          <option value="scoopy_karbu">Scoopy Karbu / FI (110cc)</option>
+          <option value="scoopy_esp">Scoopy eSP / Prestige (110cc)</option>
+          <option value="vario_110">Vario 110 Karbu / FI</option>
+          <option value="vario_125_old">Vario 125 Old (Bohlam / LED)</option>
+          <option value="vario_125_new">Vario 125 New (LED Gen 2/3)</option>
+          <option value="vario_150">Vario 150 (2015–2021)</option>
+          <option value="vario_160" selected>Vario 160</option>
+          <option value="pcx_150">PCX 150 Lokal</option>
+          <option value="pcx_160">PCX 160</option>
+          <option value="adv_150">ADV 150</option>
+          <option value="adv_160">ADV 160</option>
+        </optgroup>
+        <optgroup label="Suzuki">
+          <option value="suzuki_spin">Spin / Skywave / Hayate 125</option>
+          <option value="suzuki_nex">Nex / Nex II 115</option>
+          <option value="suzuki_address">Address FI 115</option>
+          <option value="suzuki_burgman">Burgman Street 125EX</option>
+        </optgroup>
+        <optgroup label="Vespa Matic">
+          <option value="vespa_lx125">LX / S 125 3V i-get</option>
+          <option value="vespa_sprint150">Primavera / Sprint 150 3V i-get</option>
+          <option value="vespa_gts150">GTS Super 150 i-get</option>
+          <option value="vespa_gts300">GTS 300 HPE</option>
+        </optgroup>
+        <optgroup label="TVS">
+          <option value="tvs_dazz">Dazz 110</option>
+          <option value="tvs_callisto">Callisto 110 / 125</option>
+          <option value="tvs_ntorq">Ntorq 125</option>
+        </optgroup>
+      </select>
+      <div class="weight-note">
+        <span style="color:var(--muted)">Bobot Motor:</span>
+        <span id="quick-weight" style="font-weight:700">115 Kg</span>
+      </div>
+    </section>
+
+    <!-- 3. KARTU 2: KONDISI BEBAN -->
+    <section class="card" aria-label="Kondisi Beban">
+      <span class="kicker">KONDISI BEBAN</span>
+      <div class="load-grid">
+        <div class="load-col">
+          <div class="mini-row">
+            <label for="in-rider">Berat Badan (Kg)</label>
+            <span class="hint" style="color:var(--muted)">Std 65</span>
+          </div>
+          <div class="stepper">
+            <input id="in-rider" type="number" min="35" max="160" step="1" value="50" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="rider" data-dir="1" aria-label="Naikkan berat badan">▲</button>
+              <button type="button" class="spin-btn" data-key="rider" data-dir="-1" aria-label="Turunkan berat badan">▼</button>
+            </div>
+          </div>
+        </div>
+        <div class="load-col">
+          <div class="mini-row">
+            <span>Beban</span>
+            <span id="total-load-lbl" class="hint c-up" style="font-weight:600">Total 50 Kg</span>
+          </div>
+          <div class="seg seg-2 seg-load">
+            <button type="button" class="seg-btn pass-btn active" data-pass="single">Single</button>
+            <button type="button" class="seg-btn pass-btn" data-pass="boncengan">Boncengan</button>
+          </div>
+        </div>
+      </div>
+      <div id="pass-extra" class="extra-row hidden">
+        <label for="in-pass" style="font-weight:600;color:var(--body)">Berat Boncenger (Kg):</label>
+        <div class="stepper" style="width:124px">
+          <input id="in-pass" type="number" min="20" max="130" step="1" value="55" />
+          <div class="spin-col">
+            <button type="button" class="spin-btn" data-key="pass" data-dir="1" aria-label="Naikkan berat boncenger">▲</button>
+            <button type="button" class="spin-btn" data-key="pass" data-dir="-1" aria-label="Turunkan berat boncenger">▼</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. KARTU 3: DATA STANDAR MOTOR -->
+    <section class="card" aria-label="Data Standar Motor">
+      <span id="std-header" class="kicker">DATA STANDAR · VARIO 160</span>
+      <div class="spec-list" id="std-list"></div>
+    </section>
+
+    <!-- 5. KARTU 4: CVT SETTING -->
+    <section class="card" aria-label="CVT Setting">
+      <span class="kicker">CVT SETTING</span>
+      <div style="margin-bottom:12px">
+        <div class="set-lbl"><span>Preset Racikan Kirian Cepat</span><span>opsional</span></div>
+        <select id="preset-select" class="select-box">
+          <option value="custom">Custom (Atur Parameter Manual)</option>
+          <option value="daily">Harian Responsif</option>
+          <option value="touring">Touring / Nafas Panjang</option>
+          <option value="stopgo">Stop &amp; Go / Macet</option>
+          <option value="extreme">Kirian Ekstrem / Akselerasi</option>
+        </select>
+      </div>
+      <div class="set-grid">
+        <div>
+          <div class="set-lbl"><span>Roller A (g)</span><span id="lbl-std-rA">Std 19 g</span></div>
+          <div class="stepper">
+            <input id="in-rA" type="number" min="6" max="25" step="0.5" value="13" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="rA" data-dir="1" aria-label="Naikkan Roller A">▲</button>
+              <button type="button" class="spin-btn" data-key="rA" data-dir="-1" aria-label="Turunkan Roller A">▼</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="set-lbl"><span>Roller B (g)</span><span>Std 0</span></div>
+          <div class="stepper">
+            <input id="in-rB" type="number" min="0" max="25" step="0.5" value="15" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="rB" data-dir="1" aria-label="Naikkan Roller B">▲</button>
+              <button type="button" class="spin-btn" data-key="rB" data-dir="-1" aria-label="Turunkan Roller B">▼</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="set-lbl"><span>Per Sentri (RPM)</span><span>Std 1,000</span></div>
+          <div class="stepper">
+            <input id="in-centri" type="number" min="800" max="2500" step="100" value="1200" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="centri" data-dir="1" aria-label="Naikkan Per Sentri">▲</button>
+              <button type="button" class="spin-btn" data-key="centri" data-dir="-1" aria-label="Turunkan Per Sentri">▼</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="set-lbl"><span>Per CVT (RPM)</span><span>Std 1,000</span></div>
+          <div class="stepper">
+            <input id="in-cvt" type="number" min="800" max="2500" step="100" value="1500" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="cvt" data-dir="1" aria-label="Naikkan Per CVT">▲</button>
+              <button type="button" class="spin-btn" data-key="cvt" data-dir="-1" aria-label="Turunkan Per CVT">▼</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="set-lbl"><span>Derajat Pulley (°)</span><span id="lbl-std-deg">Std 15</span></div>
+          <div class="stepper">
+            <input id="in-deg" type="number" min="13" max="15.5" step="0.1" value="13.8" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="deg" data-dir="1" aria-label="Naikkan Derajat Pulley">▲</button>
+              <button type="button" class="spin-btn" data-key="deg" data-dir="-1" aria-label="Turunkan Derajat Pulley">▼</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="set-lbl"><span>Km servis CVT</span><span>Std 0</span></div>
+          <div class="stepper">
+            <input id="in-km" type="number" min="0" max="30000" step="500" value="0" />
+            <div class="spin-col">
+              <button type="button" class="spin-btn" data-key="km" data-dir="1" aria-label="Naikkan Km servis">▲</button>
+              <button type="button" class="spin-btn" data-key="km" data-dir="-1" aria-label="Turunkan Km servis">▼</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" id="btn-reset" class="reset-btn">Reset ke Standar Pabrik</button>
+    </section>
+
+    <!-- CATATAN PENTING -->
+    <section class="card warn-card" aria-label="Catatan Penting">
+      <div class="warn-title">⚠️ PENTING</div>
+      <p class="warn-text">Total beban pengendara (single/boncengan) dan kondisi servis CVT berpengaruh besar ke performa. Beban lebih berat menahan tarikan awal dan menurunkan top speed. Roller peyang, v-belt melar, serta kampas ganda kotor membuat RPM naik tetapi tenaga bocor. Patokan standar memakai pengendara 65 Kg dengan CVT baru diservis.</p>
+      <p id="warn-dynamic" class="warn-dyn"></p>
+    </section>
+
+    <!-- 6. KARTU 5: KURVA DYNO & RPM + PENGARUH TIAP PART -->
+    <section class="card" aria-label="Kurva Dyno dan RPM">
+      <span class="kicker">KURVA DYNO &amp; RPM</span>
+      <div class="seg seg-2">
+        <button type="button" class="seg-btn tab-btn active" data-tab="power">Tenaga &amp; Torsi</button>
+        <button type="button" class="seg-btn tab-btn" data-tab="rpm">RPM Mesin</button>
+      </div>
+      <div class="canvas-box">
+        <canvas id="dyno-canvas"></canvas>
+      </div>
+      <div id="chart-legend" class="legend"></div>
+      <p id="chart-caption" class="caption"></p>
+    </section>
+
+    <!-- PENGARUH TIAP PART -->
+    <section class="card" aria-label="Pengaruh Tiap Part">
+      <span class="kicker">PENGARUH TIAP PART</span>
+      <div class="list-panel">
+        <div id="part-list"></div>
+        <p class="panel-foot">B (Bawah) | T (Tengah) | A (Atas) | Top = Spido</p>
+      </div>
+    </section>
+
+    <!-- 7. KARTU 6: HASIL -->
+    <section class="card" aria-label="Hasil Simulasi">
+      <div class="res-head">
+        <span class="kicker" style="margin:0">HASIL</span>
+        <span id="char-badge" class="char-badge">Responsif Seimbang</span>
+      </div>
+      <div class="list-panel" id="res-list"></div>
+      <p id="res-summary" class="summary-p"></p>
+    </section>
+
+    <!-- 8. KARTU 7: SUMBER DATA & DISCLAIMER -->
+    <section class="card" aria-label="Sumber Data dan Disclaimer">
+      <span class="kicker">SUMBER DATA &amp; DISCLAIMER</span>
+      <p class="warn-text" style="margin-bottom:8px">Angka di dalam simulator <strong>CVT Lab</strong> berasal dari gabungan spesifikasi teknis standar pabrikan dan model perhitungan pendekatan empiris bengkel (bukan hasil pengukuran langsung mesin dynamometer fisik).</p>
+
+      <div class="disc-section">
+        <div class="disc-sub">1. Data Spesifikasi Standar Motor (Faktual Pabrikan)</div>
+        <ul class="disc-list">
+          <li><strong>Tenaga Puncak (PS) &amp; Torsi Puncak (Nm):</strong> Diambil dari lembar spesifikasi resmi masing-masing pabrikan (Yamaha, Honda, Suzuki, Vespa Matic, dan TVS), misalnya Vario 160 di 15.8 PS @ 8,500 RPM dan 14.7 Nm @ 6,500 RPM; Grand Filano &amp; Fazzio 125 Hybrid di 8.3 PS @ 6,500 RPM dan 10.6 Nm @ 4,500 RPM; NMAX New 155 di 15.4 PS @ 8,000 RPM dan 13.9 Nm @ 6,500 RPM.</li>
+          <li><strong>Berat Roller Standar (g):</strong> Mengacu pada kode suku cadang OEM bawaan pabrik (contoh: Vario 160 = 19 g, BeAT/BeAT Street/Scoopy eSP = 15 g, NMAX/Aerox/Filano = 13 g, Mio M3/Fino 125/X-Ride 125/Nex II = 12 g, Vespa Primavera/Sprint 150 = 13.5 g).</li>
+          <li><strong>Derajat Pulley Standar &amp; RPM Per:</strong> Mengacu pada sudut kemiringan <em>face drive</em> standar pabrikan (umumnya 14°–15°) serta nilai <em>engagement</em> kopling sentrifugal standar (sekitar 1,000 RPM patokan kekerasan per atau ~2,950–3,300 RPM mesin saat kampas mulai menggigit mangkok).</li>
+          <li><strong>Top Speed Standar (GPS vs Spido):</strong> Diestimasi dari rasio gigi reduksi akhir (<em>final gear</em>), diameter roda standar, serta toleransi penyimpangan spidometer pabrik (umumnya +6% hingga +10% lebih tinggi dibanding kecepatan GPS asli).</li>
+        </ul>
+      </div>
+
+      <div class="disc-section">
+        <div class="disc-sub">2. Angka Hasil Simulasi &amp; Persentase Tarikan (Model Matematis Pendekatan)</div>
+        <ul class="disc-list">
+          <li><strong>Pengaruh Berat Roller:</strong> Menggunakan selisih bobot rata-rata roller modifikasi terhadap roller standar (&Delta;W = W<sub>std</sub> &minus; W<sub>avg</sub>). Berdasarkan prinsip gaya sentrifugal (F = m &middot; &omega;&sup2; &middot; r), roller lebih ringan membutuhkan putaran mesin (RPM) lebih tinggi untuk mendorong rumah roller&mdash;meningkatkan akselerasi bawah/tengah namun berpotensi menahan dorongan maksimal v-belt pada putaran atas.</li>
+          <li><strong>Pengaruh Per Sentri &amp; Per CVT:</strong> Per Sentri (1,000–2,000 RPM) menggeser titik RPM kopling masuk (<em>clutch engagement</em>) agar motor langsung meluncur pada kurva torsi berisi; Per CVT menahan bukaan <em>secondary sliding sheave</em> agar rasio tidak cepat berat saat menanjak/stop &amp; go namun menambah sedikit gesekan di putaran atas.</li>
+          <li><strong>Pengaruh Derajat Pulley (13.5° vs 15°):</strong> Sudut lebih lancip mempercepat penjepitan v-belt di awal bukaan dan memperpanjang lintasan naik v-belt di puncak pulley.</li>
+          <li><strong>Efek Berat Pengendara &amp; Boncengan:</strong> Dihitung menggunakan rasio <em>Power-to-Weight Ratio</em> (PWR) terhadap patokan standar (bobot motor + rider 65 Kg). Penambahan beban langsung mengurangi percepatan linear (a = F / m) dan menambah tahanan gelinding ban.</li>
+          <li><strong>Efek Kilometer Sejak Servis:</strong> Menggunakan faktor degradasi linear akibat gesekan debu kampas ganda, keausan sisi roller yang mulai peyang, dan melarnya v-belt yang menurunkan efisiensi transfer tenaga ke roda belakang.</li>
+        </ul>
+      </div>
+
+      <div class="disc-section">
+        <div class="disc-sub">3. Catatan Penting (Limitasi Simulator)</div>
+        <ul class="disc-list">
+          <li><strong>Kondisi Mesin &amp; ECU:</strong> Tidak memperhitungkan perubahan AFR (<em>Air-Fuel Ratio</em>), derajat pengapian, limiter RPM ECU standar, atau kondisi filter udara dan busi.</li>
+          <li><strong>Kualitas &amp; Toleransi Part Aftermarket:</strong> Per CVT &ldquo;1,500 RPM&rdquo; dari merek berbeda sering memiliki tingkat kekerasan konstanta pegas (k) yang berbeda di lapangan.</li>
+          <li><strong>Faktor Eksternal:</strong> Tidak menghitung tekanan angin ban, hambatan angin (<em>aerodynamic drag</em>), maupun kemiringan jalan.</li>
+          <li><strong>Tujuan Penggunaan:</strong> Gunakan simulator ini sebagai alat bantu membandingkan arah karakter racikan kirian sebelum membongkar CVT, bukan sebagai pengganti pengukuran mesin dynamometer (<em>dyno test</em>) fisik.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9. FOOTER CREDIT -->
+    <footer class="credit">Created by Andi Santoso with Gemini AI</footer>
+  </div>
+
+  <script>
+    // Konfigurasi Inline Apple Touch Icon & Web App Manifest untuk Add to Home Screen
+    (function setupPWA() {
+      try {
+        const c = document.createElement('canvas');
+        c.width = 180;
+        c.height = 180;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#2563eb';
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 180, 180, 36);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.arc(90, 90, 52, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(90, 90, 18, 0, Math.PI * 2);
+        ctx.fill();
+        for (let i = 0; i < 6; i++) {
+          const a = (i * Math.PI) / 3;
+          ctx.beginPath();
+          ctx.arc(90 + Math.cos(a) * 36, 90 + Math.sin(a) * 36, 6.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        const pngUrl = c.toDataURL('image/png');
+        document.getElementById('apple-icon').href = pngUrl;
+        const manifest = {
+          name: 'CVT Lab v2.5 · Simulasi Kirian CVT',
+          short_name: 'CVT Lab v2.5',
+          start_url: '.',
+          display: 'standalone',
+          background_color: '#f8fafc',
+          theme_color: '#2563eb',
+          icons: [{ src: pngUrl, sizes: '180x180', type: 'image/png' }]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        document.getElementById('web-manifest').href = URL.createObjectURL(blob);
+      } catch (e) {}
+    })();
+
+    // Database Motor Matic: Urutan Pabrikan (Yamaha, Honda, Suzuki, Vespa Matic, TVS)
+    const SCOOTER_DB = [
+      // 1. YAMAHA
+      { id: 'mio_sporty', brand: 'Yamaha', name: 'Mio Sporty / Smile (115cc)', ps: 8.35, psRpm: 8000, nm: 7.84, nmRpm: 7000, stdRoller: 10.5, stdDeg: 14.0, gpsTop: 88.5, spidoTop: 96, weight: 92, engageRpm: 3150 },
+      { id: 'mio_j', brand: 'Yamaha', name: 'Mio J / Soul GT 115', ps: 7.75, psRpm: 8500, nm: 8.5, nmRpm: 5000, stdRoller: 9.5, stdDeg: 14.0, gpsTop: 89.0, spidoTop: 97, weight: 92, engageRpm: 3100 },
+      { id: 'mio_m3', brand: 'Yamaha', name: 'Mio M3 / Z / Soul GT 125', ps: 9.5, psRpm: 8000, nm: 9.6, nmRpm: 5500, stdRoller: 12, stdDeg: 14.0, gpsTop: 94.5, spidoTop: 103, weight: 92, engageRpm: 3100 },
+      { id: 'fino_karbu', brand: 'Yamaha', name: 'Fino Karbu (115cc)', ps: 8.35, psRpm: 8000, nm: 7.84, nmRpm: 7000, stdRoller: 10.5, stdDeg: 14.0, gpsTop: 88.0, spidoTop: 96, weight: 93, engageRpm: 3150 },
+      { id: 'fino_fi', brand: 'Yamaha', name: 'Fino FI 115', ps: 7.75, psRpm: 8500, nm: 8.5, nmRpm: 5000, stdRoller: 9.5, stdDeg: 14.0, gpsTop: 89.0, spidoTop: 97, weight: 94, engageRpm: 3100 },
+      { id: 'fino_125', brand: 'Yamaha', name: 'Fino 125 Blue Core', ps: 9.5, psRpm: 8000, nm: 9.6, nmRpm: 5500, stdRoller: 12, stdDeg: 14.0, gpsTop: 94.0, spidoTop: 102, weight: 98, engageRpm: 3100 },
+      { id: 'xride_115', brand: 'Yamaha', name: 'X-Ride 115', ps: 7.75, psRpm: 8500, nm: 8.5, nmRpm: 5000, stdRoller: 9.5, stdDeg: 14.0, gpsTop: 88.0, spidoTop: 96, weight: 98, engageRpm: 3150 },
+      { id: 'xride_125', brand: 'Yamaha', name: 'X-Ride 125', ps: 9.5, psRpm: 8000, nm: 9.6, nmRpm: 5500, stdRoller: 12, stdDeg: 14.0, gpsTop: 93.0, spidoTop: 101, weight: 98, engageRpm: 3150 },
+      { id: 'gear_125', brand: 'Yamaha', name: 'Gear 125', ps: 9.5, psRpm: 8000, nm: 9.6, nmRpm: 5500, stdRoller: 12, stdDeg: 14.0, gpsTop: 94.0, spidoTop: 102, weight: 95, engageRpm: 3100 },
+      { id: 'fazzio_125', brand: 'Yamaha', name: 'Fazzio 125 Hybrid', ps: 8.3, psRpm: 6500, nm: 10.6, nmRpm: 4500, stdRoller: 13, stdDeg: 14.0, gpsTop: 93.5, spidoTop: 102, weight: 95, engageRpm: 2950 },
+      { id: 'filano_125', brand: 'Yamaha', name: 'Grand Filano 125 Hybrid', ps: 8.3, psRpm: 6500, nm: 10.6, nmRpm: 4500, stdRoller: 13, stdDeg: 14.0, gpsTop: 92.5, spidoTop: 101, weight: 100, engageRpm: 2950 },
+      { id: 'nmax_old', brand: 'Yamaha', name: 'NMAX 155 Old (Gen 1)', ps: 15.1, psRpm: 8000, nm: 14.4, nmRpm: 6000, stdRoller: 13, stdDeg: 14.0, gpsTop: 114.0, spidoTop: 124, weight: 127, engageRpm: 3150 },
+      { id: 'nmax_new', brand: 'Yamaha', name: 'NMAX 155 New / Connected / Turbo', ps: 15.4, psRpm: 8000, nm: 13.9, nmRpm: 6500, stdRoller: 13, stdDeg: 14.0, gpsTop: 115.5, spidoTop: 126, weight: 130, engageRpm: 3150 },
+      { id: 'aerox_old', brand: 'Yamaha', name: 'Aerox 155 Old (Gen 1)', ps: 15.0, psRpm: 8000, nm: 13.8, nmRpm: 6250, stdRoller: 13, stdDeg: 14.0, gpsTop: 116.0, spidoTop: 126, weight: 118, engageRpm: 3250 },
+      { id: 'aerox_new', brand: 'Yamaha', name: 'Aerox 155 New / Connected', ps: 15.4, psRpm: 8000, nm: 13.9, nmRpm: 6500, stdRoller: 13, stdDeg: 14.0, gpsTop: 117.5, spidoTop: 128, weight: 122, engageRpm: 3250 },
+
+      // 2. HONDA
+      { id: 'beat_karbu', brand: 'Honda', name: 'BeAT Karbu / FI (110cc)', ps: 8.68, psRpm: 7500, nm: 9.01, nmRpm: 6500, stdRoller: 13, stdDeg: 14.0, gpsTop: 90.5, spidoTop: 98, weight: 93, engageRpm: 3100 },
+      { id: 'beat_esp', brand: 'Honda', name: 'BeAT eSP / Deluxe (110cc)', ps: 9.0, psRpm: 7500, nm: 9.3, nmRpm: 5500, stdRoller: 15, stdDeg: 14.0, gpsTop: 92.0, spidoTop: 100, weight: 89, engageRpm: 3100 },
+      { id: 'beat_street', brand: 'Honda', name: 'BeAT Street eSP / New (110cc)', ps: 9.0, psRpm: 7500, nm: 9.3, nmRpm: 5500, stdRoller: 15, stdDeg: 14.0, gpsTop: 91.5, spidoTop: 99, weight: 89, engageRpm: 3100 },
+      { id: 'scoopy_karbu', brand: 'Honda', name: 'Scoopy Karbu / FI (110cc)', ps: 8.7, psRpm: 7500, nm: 9.1, nmRpm: 6000, stdRoller: 13, stdDeg: 14.0, gpsTop: 90.0, spidoTop: 98, weight: 96, engageRpm: 3100 },
+      { id: 'scoopy_esp', brand: 'Honda', name: 'Scoopy eSP / Prestige (110cc)', ps: 9.0, psRpm: 7500, nm: 9.3, nmRpm: 5500, stdRoller: 15, stdDeg: 14.0, gpsTop: 91.5, spidoTop: 99, weight: 94, engageRpm: 3100 },
+      { id: 'vario_110', brand: 'Honda', name: 'Vario 110 Karbu / FI', ps: 8.9, psRpm: 8000, nm: 8.4, nmRpm: 6500, stdRoller: 13, stdDeg: 14.0, gpsTop: 94.5, spidoTop: 103, weight: 101, engageRpm: 3200 },
+      { id: 'vario_125_old', brand: 'Honda', name: 'Vario 125 Old (Bohlam / LED)', ps: 11.1, psRpm: 8500, nm: 10.8, nmRpm: 5000, stdRoller: 18, stdDeg: 14.5, gpsTop: 104.0, spidoTop: 113, weight: 111, engageRpm: 3100 },
+      { id: 'vario_125_new', brand: 'Honda', name: 'Vario 125 New (LED Gen 2/3)', ps: 11.1, psRpm: 8500, nm: 10.8, nmRpm: 5000, stdRoller: 18, stdDeg: 14.5, gpsTop: 103.5, spidoTop: 112, weight: 111, engageRpm: 3100 },
+      { id: 'vario_150', brand: 'Honda', name: 'Vario 150 (2015–2021)', ps: 13.1, psRpm: 8500, nm: 13.4, nmRpm: 5000, stdRoller: 15, stdDeg: 14.5, gpsTop: 109.5, spidoTop: 119, weight: 112, engageRpm: 3150 },
+      { id: 'vario_160', brand: 'Honda', name: 'Vario 160', ps: 15.8, psRpm: 8500, nm: 14.7, nmRpm: 6500, stdRoller: 19, stdDeg: 15.0, gpsTop: 117.7, spidoTop: 128, weight: 115, engageRpm: 3200 },
+      { id: 'pcx_150', brand: 'Honda', name: 'PCX 150 Lokal', ps: 14.7, psRpm: 8500, nm: 13.2, nmRpm: 6500, stdRoller: 17, stdDeg: 14.5, gpsTop: 111.0, spidoTop: 121, weight: 131, engageRpm: 3200 },
+      { id: 'pcx_160', brand: 'Honda', name: 'PCX 160', ps: 16.0, psRpm: 8500, nm: 14.7, nmRpm: 6500, stdRoller: 19, stdDeg: 15.0, gpsTop: 116.5, spidoTop: 127, weight: 132, engageRpm: 3200 },
+      { id: 'adv_150', brand: 'Honda', name: 'ADV 150', ps: 14.5, psRpm: 8500, nm: 13.8, nmRpm: 6500, stdRoller: 20, stdDeg: 14.5, gpsTop: 108.5, spidoTop: 118, weight: 133, engageRpm: 3250 },
+      { id: 'adv_160', brand: 'Honda', name: 'ADV 160', ps: 16.0, psRpm: 8500, nm: 14.7, nmRpm: 6500, stdRoller: 20, stdDeg: 15.0, gpsTop: 114.5, spidoTop: 125, weight: 133, engageRpm: 3250 },
+
+      // 3. SUZUKI
+      { id: 'suzuki_spin', brand: 'Suzuki', name: 'Spin / Skywave / Hayate 125', ps: 9.6, psRpm: 8000, nm: 9.6, nmRpm: 6000, stdRoller: 12, stdDeg: 14.0, gpsTop: 95.0, spidoTop: 103, weight: 108, engageRpm: 3150 },
+      { id: 'suzuki_nex', brand: 'Suzuki', name: 'Nex / Nex II 115', ps: 9.1, psRpm: 8000, nm: 8.5, nmRpm: 6000, stdRoller: 12, stdDeg: 14.0, gpsTop: 91.5, spidoTop: 99, weight: 93, engageRpm: 3100 },
+      { id: 'suzuki_address', brand: 'Suzuki', name: 'Address FI 115', ps: 9.1, psRpm: 8000, nm: 8.6, nmRpm: 6000, stdRoller: 12, stdDeg: 14.0, gpsTop: 92.0, spidoTop: 100, weight: 97, engageRpm: 3100 },
+      { id: 'suzuki_burgman', brand: 'Suzuki', name: 'Burgman Street 125EX', ps: 8.6, psRpm: 6500, nm: 10.0, nmRpm: 5500, stdRoller: 13, stdDeg: 14.0, gpsTop: 93.5, spidoTop: 101, weight: 111, engageRpm: 3000 },
+
+      // 4. VESPA MATIC
+      { id: 'vespa_lx125', brand: 'Vespa Matic', name: 'LX / S 125 3V i-get', ps: 10.3, psRpm: 7600, nm: 10.2, nmRpm: 6000, stdRoller: 11.5, stdDeg: 14.5, gpsTop: 96.0, spidoTop: 104, weight: 114, engageRpm: 3250 },
+      { id: 'vespa_sprint150', brand: 'Vespa Matic', name: 'Primavera / Sprint 150 3V i-get', ps: 12.1, psRpm: 7500, nm: 12.4, nmRpm: 5000, stdRoller: 13.5, stdDeg: 14.5, gpsTop: 103.5, spidoTop: 112, weight: 115, engageRpm: 3250 },
+      { id: 'vespa_gts150', brand: 'Vespa Matic', name: 'GTS Super 150 i-get', ps: 14.7, psRpm: 8250, nm: 13.5, nmRpm: 6750, stdRoller: 14, stdDeg: 14.5, gpsTop: 108.0, spidoTop: 117, weight: 140, engageRpm: 3300 },
+      { id: 'vespa_gts300', brand: 'Vespa Matic', name: 'GTS 300 HPE', ps: 23.8, psRpm: 8250, nm: 26.0, nmRpm: 5250, stdRoller: 18, stdDeg: 14.5, gpsTop: 126.0, spidoTop: 136, weight: 160, engageRpm: 3200 },
+
+      // 5. TVS
+      { id: 'tvs_dazz', brand: 'TVS', name: 'Dazz 110', ps: 8.7, psRpm: 7500, nm: 8.7, nmRpm: 5500, stdRoller: 12, stdDeg: 14.0, gpsTop: 89.5, spidoTop: 97, weight: 93, engageRpm: 3100 },
+      { id: 'tvs_callisto', brand: 'TVS', name: 'Callisto 110 / 125', ps: 8.2, psRpm: 6500, nm: 10.5, nmRpm: 4500, stdRoller: 13, stdDeg: 14.0, gpsTop: 91.0, spidoTop: 99, weight: 108, engageRpm: 3000 },
+      { id: 'tvs_ntorq', brand: 'TVS', name: 'Ntorq 125', ps: 10.2, psRpm: 7000, nm: 10.8, nmRpm: 5500, stdRoller: 11, stdDeg: 14.0, gpsTop: 97.5, spidoTop: 106, weight: 111, engageRpm: 3200 }
+    ];
+
+    const state = {
+      modelId: 'vario_160',
+      rider: 50,
+      passMode: 'single',
+      passWeight: 55,
+      rA: 13,
+      rB: 15,
+      centri: 1200,
+      cvt: 1500,
+      deg: 13.8,
+      km: 0,
+      tab: 'power'
+    };
+
+    const STEP_CFG = {
+      rider: { step: 1, min: 35, max: 160, el: 'in-rider' },
+      pass: { step: 1, min: 20, max: 130, el: 'in-pass' },
+      rA: { step: 0.5, min: 6, max: 25, el: 'in-rA', custom: true },
+      rB: { step: 0.5, min: 0, max: 25, el: 'in-rB', custom: true },
+      centri: { step: 100, min: 800, max: 2500, el: 'in-centri', custom: true },
+      cvt: { step: 100, min: 800, max: 2500, el: 'in-cvt', custom: true },
+      deg: { step: 0.1, min: 13, max: 15.5, el: 'in-deg', custom: true },
+      km: { step: 500, min: 0, max: 30000, el: 'in-km' }
+    };
+
+    function getModel() {
+      return SCOOTER_DB.find(m => m.id === state.modelId) || SCOOTER_DB.find(m => m.id === 'vario_160') || SCOOTER_DB[0];
+    }
+
+    function fmtNum(val, dec = 1) {
+      return Number(val).toFixed(dec);
+    }
+
+    function fmtComma(num) {
+      return Math.round(num).toLocaleString('en-US');
+    }
+
+    function colorClass(num) {
+      const rounded = Math.round(num * 10) / 10;
+      if (rounded > 0) return 'c-up';
+      if (rounded < 0) return 'c-down';
+      return 'c-flat';
+    }
+
+    function signStr(num, dec = 0) {
+      const val = dec === 0 ? Math.round(num) : Number(num.toFixed(dec));
+      if (val > 0) return `+${dec === 0 ? val : val.toFixed(dec)}`;
+      if (val < 0) return `${dec === 0 ? val : val.toFixed(dec)}`;
+      return dec === 0 ? '+0' : '0.0';
+    }
+
+    function spanColor(text, num) {
+      return `<span class="${colorClass(num)}">${text}</span>`;
+    }
+
+    function populateMotors() {
+      const sel = document.getElementById('motor-select');
+      sel.innerHTML = '';
+      const groups = {};
+      SCOOTER_DB.forEach(m => {
+        if (!groups[m.brand]) {
+          const og = document.createElement('optgroup');
+          og.label = m.brand;
+          groups[m.brand] = og;
+          sel.appendChild(og);
+        }
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.name;
+        groups[m.brand].appendChild(opt);
+      });
+      sel.value = state.modelId;
+    }
+
+    function compute() {
+      const m = getModel();
+      const avgRoller = state.rB > 0 ? (state.rA + state.rB) / 2 : state.rA;
+      const dRoller = m.stdRoller - avgRoller;
+      const dCentri = (state.centri - 1000) / 100;
+      const dCvt = (state.cvt - 1000) / 100;
+      const dDeg = m.stdDeg - state.deg;
+
+      const totalHuman = state.rider + (state.passMode === 'boncengan' ? state.passWeight : 0);
+      const stdMass = m.weight + 65;
+      const curMass = m.weight + totalHuman;
+      const massDeltaPct = ((stdMass - curMass) / stdMass) * 100;
+      const kmWear = Math.min(state.km / 10000, 1.5);
+
+      const pRoller = {
+        top: dRoller * -0.58,
+        b: dRoller * 1.35,
+        t: dRoller * 0.95,
+        a: dRoller * -1.05
+      };
+      const engageRpm = Math.round(m.engageRpm + (state.centri - 1000) * 0.92);
+      const pCentri = {
+        top: 0,
+        b: dCentri * 1.1,
+        t: dCentri * 0.35,
+        a: 0
+      };
+      const pCvt = {
+        top: dCvt * -0.22,
+        b: dCvt * 0.45,
+        t: dCvt * 0.65,
+        a: dCvt * -0.25
+      };
+      const pDeg = {
+        top: dDeg * 0.85,
+        b: dDeg * 1.6,
+        t: dDeg * 0.9,
+        a: dDeg * 0.8
+      };
+      const pLoad = {
+        top: massDeltaPct * 0.14 - kmWear * 2.2,
+        b: massDeltaPct * 0.95 - kmWear * 4.5,
+        t: massDeltaPct * 0.85 - kmWear * 3.8,
+        a: massDeltaPct * 0.75 - kmWear * 3.2
+      };
+
+      const rawTopSpidoNoLoad = m.spidoTop + pRoller.top + pCentri.top + pCvt.top + pDeg.top;
+      const totalTopSpido = Math.max(70, rawTopSpidoNoLoad + pLoad.top);
+      const ratioSpidoGps = m.gpsTop / m.spidoTop;
+      const totalTopGps = totalTopSpido * ratioSpidoGps;
+
+      const lowPct = pRoller.b + pCentri.b + pCvt.b + pDeg.b + pLoad.b;
+      const midPct = pRoller.t + pCentri.t + pCvt.t + pDeg.t + pLoad.t;
+      const highPct = pRoller.a + pCentri.a + pCvt.a + pDeg.a + pLoad.a;
+
+      const stdWheelPs = m.ps * 0.81;
+      const curWheelPs = stdWheelPs * (1 + (midPct * 0.0025) - kmWear * 0.035);
+
+      const rpmShift = dRoller * 185 + dCvt * 95 + dDeg * 110 + kmWear * 260;
+      const rpm30 = Math.round(Math.max(engageRpm + 300, m.psRpm * 0.72 + rpmShift * 0.9));
+      const rpm60 = Math.round(m.psRpm * 0.81 + rpmShift * 0.95);
+      const rpm90 = Math.round(m.psRpm * 0.94 + rpmShift * 0.85);
+      const holdRpm = Math.round((rpm30 + rpm60 + rpm90) / 3);
+
+      return {
+        m, avgRoller, totalHuman, kmWear, engageRpm,
+        pRoller, pCentri, pCvt, pDeg, pLoad,
+        rawTopSpidoNoLoad, totalTopSpido, totalTopGps,
+        lowPct, midPct, highPct, stdWheelPs, curWheelPs,
+        rpm30, rpm60, rpm90, holdRpm
+      };
+    }
+
+    function renderAll() {
+      const res = compute();
+      const { m } = res;
+
+      document.getElementById('quick-weight').textContent = `${m.weight} Kg`;
+      document.getElementById('total-load-lbl').textContent = `Total ${res.totalHuman} Kg`;
+      document.getElementById('pass-extra').classList.toggle('hidden', state.passMode !== 'boncengan');
+
+      document.querySelectorAll('.pass-btn').forEach(b => b.classList.toggle('active', b.dataset.pass === state.passMode));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.tab));
+
+      // Data Standar Motor
+      document.getElementById('std-header').textContent = `DATA STANDAR · ${m.name.toUpperCase()}`;
+      document.getElementById('lbl-std-rA').textContent = `Std ${m.stdRoller} g`;
+      document.getElementById('lbl-std-deg').textContent = `Std ${m.stdDeg}`;
+
+      const stdRows = [
+        ['Tenaga puncak', `${fmtNum(m.ps, 1)} PS @ ${fmtComma(m.psRpm)} RPM`],
+        ['Torsi puncak', `${fmtNum(m.nm, 1)} Nm @ ${fmtComma(m.nmRpm)} RPM`],
+        ['Roller standar', `${m.stdRoller} g`],
+        ['Per Sentri & Per CVT (patokan)', '≈ 1,000 RPM'],
+        ['Derajat Pulley', `≈ ${m.stdDeg}°`],
+        ['Top speed standar (GPS)', `${fmtNum(m.gpsTop, 1)} Km/j | Spido ${m.spidoTop}`],
+        ['Berat Motor', `${m.weight} Kg`]
+      ];
+      document.getElementById('std-list').innerHTML = stdRows.map(([k, v]) =>
+        `<div class="spec-item"><span class="spec-lbl">${k}</span><span class="spec-val">${v}</span></div>`
+      ).join('');
+
+      // Warning Dinamis
+      const diffLoad = res.totalHuman - 65;
+      let loadMsg = diffLoad < 0
+        ? `Total beban ${res.totalHuman} Kg (lebih ringan ${Math.abs(diffLoad)} Kg dari patokan 65 Kg): akselerasi dan top speed terbantu.`
+        : diffLoad > 0
+          ? `Total beban ${res.totalHuman} Kg (lebih berat +${diffLoad} Kg dari patokan 65 Kg): tarikan awal lebih berat dan top speed terkoreksi.`
+          : `Total beban ${res.totalHuman} Kg sesuai patokan standar 65 Kg.`;
+      const kmMsg = state.km > 0
+        ? ` Jarak tempuh servis ${fmtComma(state.km)} km mulai menurunkan efisiensi transfer tenaga.`
+        : ` Kondisi CVT prima (0 km sejak servis).`;
+      document.getElementById('warn-dynamic').textContent = `• ${loadMsg}${kmMsg}`;
+
+      // Pengaruh Tiap Part
+      const isMixedRoller = state.rB > 0 && state.rB !== state.rA;
+      const rollerTitle = isMixedRoller
+        ? `Roller silang ${state.rA} g & ${state.rB} g (Average ${fmtNum(res.avgRoller, 1)} g)`
+        : `Roller ${state.rA} g`;
+
+      const parts = [
+        { name: rollerTitle, d: res.pRoller },
+        { name: `Per Sentri ${fmtComma(state.centri)} RPM`, d: res.pCentri, extra: `Kopling Masuk ${fmtComma(res.engageRpm)} RPM` },
+        { name: `Per CVT ${fmtComma(state.cvt)} RPM`, d: res.pCvt },
+        { name: `Derajat Pulley ${state.deg}°`, d: res.pDeg },
+        { name: `Beban Total ${res.totalHuman} Kg`, d: res.pLoad }
+      ];
+
+      document.getElementById('part-list').innerHTML = parts.map(p => {
+        const topVal = Math.round(p.d.top);
+        const bVal = Math.round(p.d.b);
+        const tVal = Math.round(p.d.t);
+        const aVal = Math.round(p.d.a);
+        return `
+          <div class="list-row">
+            <div class="row-title">${p.name}</div>
+            <div class="row-main ${colorClass(topVal)}">Top ${signStr(topVal, 0)} Km/j</div>
+            <div class="row-sub">
+              B ${spanColor(`${signStr(bVal, 0)}%`, bVal)} |
+              T ${spanColor(`${signStr(tVal, 0)}%`, tVal)} |
+              A ${spanColor(`${signStr(aVal, 0)}%`, aVal)}
+            </div>
+            ${p.extra ? `<div class="row-note">${p.extra}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Hasil (Unified Vertical List)
+      const spidoEst = Math.round(res.totalTopSpido);
+      const spidoDiff = spidoEst - m.spidoTop;
+      const gpsDiff = res.totalTopGps - m.gpsTop;
+      const loadEffectKm = Math.round(res.pLoad.top);
+
+      let charLabel = 'Responsif Seimbang';
+      if (res.lowPct >= 10 && res.highPct < 0) charLabel = 'Fokus Akselerasi Bawah';
+      else if (res.highPct >= 3 && res.lowPct <= 5) charLabel = 'Nafas Panjang';
+      else if (Math.abs(res.lowPct) < 2 && Math.abs(spidoDiff) <= 1) charLabel = 'Standar Pabrik';
+      document.getElementById('char-badge').textContent = charLabel;
+
+      const resultItems = [
+        {
+          title: 'Top Speed di Spido (Estimasi)',
+          main: `${spidoEst} Km/j`,
+          sub: `Standar ${m.spidoTop - 2}–${m.spidoTop} | GPS ${fmtNum(res.totalTopGps, 1)} (Std ${Math.round(m.gpsTop)})`
+        },
+        {
+          title: 'Tenaga Puncak Roda',
+          main: `${fmtNum(res.curWheelPs, 1)} PS`,
+          sub: `Standar ${fmtNum(res.stdWheelPs, 1)} PS`
+        },
+        {
+          title: 'Tarikan Bawah (20–50 Km/j)',
+          main: spanColor(`${signStr(res.lowPct, 1)}%`, res.lowPct),
+          sub: 'Respons bukaan gas awal'
+        },
+        {
+          title: 'Tarikan Tengah & Atas (80+ Km/j)',
+          main: `${spanColor(`${signStr(res.midPct, 1)}%`, res.midPct)} | ${spanColor(`${signStr(res.highPct, 1)}%`, res.highPct)}`,
+          sub: 'Tengah 50–80 Km/j | Atas 80+ Km/j'
+        },
+        {
+          title: 'RPM Jelajah (30 | 60 | 90 Km/j)',
+          main: `${fmtComma(res.rpm30)} | ${fmtComma(res.rpm60)} | ${fmtComma(res.rpm90)} RPM`,
+          sub: 'Putaran mesin pada kecepatan konstan'
+        },
+        {
+          title: 'Efek Beban Total',
+          main: spanColor(`${signStr(loadEffectKm, 0)} Km/j`, loadEffectKm),
+          sub: `Spido tanpa efek beban & servis ≈ ${Math.round(res.rawTopSpidoNoLoad)} Km/j`
+        }
+      ];
+
+      document.getElementById('res-list').innerHTML = resultItems.map(item => `
+        <div class="list-row">
+          <div class="row-title">${item.title}</div>
+          <div class="row-main lg">${item.main}</div>
+          <div class="row-sub">${item.sub}</div>
+        </div>
+      `).join('');
+
+      const spidoTrend = spidoDiff > 0 ? `naik ≈ ${spidoDiff} Km/j` : spidoDiff < 0 ? `turun ≈ ${Math.abs(spidoDiff)} Km/j` : `tetap stabil`;
+      const rpmGap = Math.abs(res.holdRpm - m.psRpm);
+      const rpmEval = rpmGap <= 450
+        ? `dekat puncak tenaga (${fmtComma(m.psRpm)} RPM): setelan seimbang.`
+        : res.holdRpm > m.psRpm
+          ? `lebih tinggi dari puncak tenaga (${fmtComma(m.psRpm)} RPM): mesin cenderung teriak di atas.`
+          : `di bawah puncak tenaga (${fmtComma(m.psRpm)} RPM): karakter halus dan hemat BBM.`;
+
+      document.getElementById('res-summary').textContent =
+        `Top speed di Spido ${spidoTrend} (GPS ${signStr(gpsDiff, 1)} Km/j). Tarikan bawah ${res.lowPct >= 0 ? 'naik' : 'turun'} ${Math.abs(res.lowPct).toFixed(1)}%, atas ${res.highPct >= 0 ? 'naik' : 'turun'} ${Math.abs(res.highPct).toFixed(1)}%. RPM tahan (${fmtComma(res.holdRpm)} RPM) ${rpmEval}`;
+
+      drawChart(res);
+    }
+
+    function drawChart(res) {
+      const canvas = document.getElementById('dyno-canvas');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const W = rect.width, H = rect.height;
+      const pad = { l: 36, r: 34, t: 14, b: 24 };
+      const plotW = W - pad.l - pad.r;
+      const plotH = H - pad.t - pad.b;
+      const maxX = 140;
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.font = '500 10px Inter, sans-serif';
+
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 4; i++) {
+        const y = pad.t + (plotH * i) / 4;
+        ctx.beginPath();
+        ctx.moveTo(pad.l, y);
+        ctx.lineTo(W - pad.r, y);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#64748b';
+      ctx.textAlign = 'center';
+      [0, 30, 60, 90, 120, 140].forEach(spd => {
+        const x = pad.l + (spd / maxX) * plotW;
+        ctx.fillText(spd, x, H - 6);
+      });
+
+      const legendEl = document.getElementById('chart-legend');
+      const captionEl = document.getElementById('chart-caption');
+
+      if (state.tab === 'power') {
+        const maxPs = Math.ceil((res.m.ps * 1.1) / 2) * 2;
+        const maxNm = Math.ceil((res.m.nm * 26) / 50) * 50;
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#2563eb';
+        for (let i = 0; i <= 4; i++) {
+          const val = Math.round((maxPs * (4 - i)) / 4);
+          ctx.fillText(val, pad.l - 5, pad.t + (plotH * i) / 4 + 3);
+        }
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#0f172a';
+        for (let i = 0; i <= 4; i++) {
+          const val = Math.round((maxNm * (4 - i)) / 4);
+          ctx.fillText(val, W - pad.r + 5, pad.t + (plotH * i) / 4 + 3);
+        }
+
+        const buildCurves = (topSpd, peakPs, lowBoost, highBoost) => {
+          const ptsPs = [], ptsNm = [];
+          const steps = 28;
+          for (let i = 0; i <= steps; i++) {
+            const v = (topSpd * i) / steps;
+            const ratio = v / topSpd;
+            const psCurve = peakPs * Math.min(1.03, Math.pow(ratio, 0.36) * (1 + (lowBoost * (1 - ratio) + highBoost * ratio) * 0.003));
+            const nmPeak = (res.m.nm * 22) * (1 + lowBoost * 0.004);
+            const nmCurve = v < 18 ? nmPeak * (0.65 + 0.35 * (v / 18)) : nmPeak * Math.exp(-0.014 * (v - 18));
+            ptsPs.push([pad.l + (v / maxX) * plotW, pad.t + plotH - (psCurve / maxPs) * plotH]);
+            ptsNm.push([pad.l + (v / maxX) * plotW, pad.t + plotH - (Math.min(maxNm, nmCurve) / maxNm) * plotH]);
+          }
+          return { ptsPs, ptsNm };
+        };
+
+        const stdC = buildCurves(res.m.gpsTop, res.stdWheelPs, 0, 0);
+        const modC = buildCurves(res.totalTopGps, res.curWheelPs, res.lowPct, res.highPct);
+
+        const drawLine = (pts, color, dashed) => {
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = dashed ? 1.5 : 2.3;
+          if (dashed) ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          pts.forEach(([x, y], idx) => idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+          ctx.stroke();
+          ctx.restore();
+        };
+
+        drawLine(stdC.ptsPs, '#93c5fd', true);
+        drawLine(stdC.ptsNm, '#94a3b8', true);
+        drawLine(modC.ptsNm, '#0f172a', false);
+        drawLine(modC.ptsPs, '#2563eb', false);
+
+        const last = modC.ptsPs[modC.ptsPs.length - 1];
+        ctx.fillStyle = '#2563eb';
+        ctx.beginPath();
+        ctx.arc(last[0], last[1], 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        legendEl.innerHTML = `
+          <span class="leg-item"><i class="swatch" style="background:#2563eb"></i>Tenaga (PS)</span>
+          <span style="color:#cbd5e1">|</span>
+          <span class="leg-item"><i class="swatch" style="background:#0f172a"></i>Torsi Roda (Nm)</span>
+        `;
+        captionEl.textContent = 'Putus-Putus = Standar | Titik = Top Speed (Km/j)';
+      } else {
+        const maxRpm = 11000;
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#64748b';
+        for (let i = 0; i <= 4; i++) {
+          const val = Math.round((maxRpm * (4 - i)) / 4);
+          ctx.fillText(val, pad.l - 5, pad.t + (plotH * i) / 4 + 3);
+        }
+
+        const peakY = pad.t + plotH - (res.m.psRpm / maxRpm) * plotH;
+        ctx.save();
+        ctx.strokeStyle = '#7c3aed';
+        ctx.lineWidth = 1.4;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.moveTo(pad.l, peakY);
+        ctx.lineTo(W - pad.r, peakY);
+        ctx.stroke();
+        ctx.restore();
+
+        const buildRpm = (topSpd, engage, r30, r60, r90) => {
+          const pts = [];
+          const steps = 28;
+          for (let i = 0; i <= steps; i++) {
+            const v = (topSpd * i) / steps;
+            let rpm;
+            if (v <= 15) rpm = 1600 + ((engage - 1600) * v) / 15;
+            else if (v <= 30) rpm = engage + ((r30 - engage) * (v - 15)) / 15;
+            else if (v <= 60) rpm = r30 + ((r60 - r30) * (v - 30)) / 30;
+            else if (v <= 90) rpm = r60 + ((r90 - r60) * (v - 60)) / 30;
+            else rpm = r90 + ((r90 + 480 - r90) * (v - 90)) / Math.max(15, topSpd - 90);
+            pts.push([pad.l + (v / maxX) * plotW, pad.t + plotH - (Math.min(maxRpm, rpm) / maxRpm) * plotH]);
+          }
+          return pts;
+        };
+
+        const stdRpmPts = buildRpm(res.m.gpsTop, res.m.engageRpm, res.m.psRpm * 0.72, res.m.psRpm * 0.81, res.m.psRpm * 0.94);
+        const modRpmPts = buildRpm(res.totalTopGps, res.engageRpm, res.rpm30, res.rpm60, res.rpm90);
+
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.6;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        stdRpmPts.forEach(([x, y], idx) => idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        modRpmPts.forEach(([x, y], idx) => idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+        ctx.stroke();
+
+        const last = modRpmPts[modRpmPts.length - 1];
+        ctx.fillStyle = '#2563eb';
+        ctx.beginPath();
+        ctx.arc(last[0], last[1], 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        legendEl.innerHTML = `
+          <span class="leg-item"><i class="swatch" style="background:#2563eb"></i>RPM Mesin</span>
+          <span style="color:#cbd5e1">|</span>
+          <span class="leg-item"><i class="swatch" style="background:#94a3b8"></i>Standar</span>
+          <span style="color:#cbd5e1">|</span>
+          <span class="leg-item"><i class="swatch" style="background:#7c3aed"></i>RPM Puncak Tenaga</span>
+        `;
+        captionEl.textContent = 'Putus-Putus = Standar | Ungu = RPM Puncak Tenaga | Titik = Top Speed (Km/j)';
+      }
+    }
+
+    function syncInputs() {
+      document.getElementById('in-rider').value = state.rider;
+      document.getElementById('in-pass').value = state.passWeight;
+      document.getElementById('in-rA').value = state.rA;
+      document.getElementById('in-rB').value = state.rB;
+      document.getElementById('in-centri').value = state.centri;
+      document.getElementById('in-cvt').value = state.cvt;
+      document.getElementById('in-deg').value = state.deg;
+      document.getElementById('in-km').value = state.km;
+    }
+
+    function resetToStd() {
+      const m = getModel();
+      state.rA = m.stdRoller;
+      state.rB = 0;
+      state.centri = 1000;
+      state.cvt = 1000;
+      state.deg = m.stdDeg;
+      state.km = 0;
+      document.getElementById('preset-select').value = 'custom';
+      syncInputs();
+      renderAll();
+    }
+
+    function applyPreset(val) {
+      const m = getModel();
+      if (val === 'custom') return;
+      if (val === 'daily') {
+        state.rA = Math.max(7, Number((m.stdRoller - 2.5).toFixed(1)));
+        state.rB = 0;
+        state.centri = 1500;
+        state.cvt = 1500;
+        state.deg = Number((m.stdDeg - 0.5).toFixed(1));
+      } else if (val === 'touring') {
+        state.rA = Math.max(7, Number((m.stdRoller - 1.5).toFixed(1)));
+        state.rB = m.stdRoller;
+        state.centri = 1200;
+        state.cvt = 1200;
+        state.deg = Number((m.stdDeg - 0.7).toFixed(1));
+      } else if (val === 'stopgo') {
+        state.rA = Math.max(7, Number((m.stdRoller - 3.5).toFixed(1)));
+        state.rB = 0;
+        state.centri = 1500;
+        state.cvt = 1500;
+        state.deg = Number((m.stdDeg - 0.8).toFixed(1));
+      } else if (val === 'extreme') {
+        state.rA = Math.max(7, Number((m.stdRoller - 4.5).toFixed(1)));
+        state.rB = Math.max(7, Number((m.stdRoller - 2.5).toFixed(1)));
+        state.centri = 1800;
+        state.cvt = 1800;
+        state.deg = Number((m.stdDeg - 1.2).toFixed(1));
+      }
+      syncInputs();
+      renderAll();
+    }
+
+    function bindEvents() {
+      document.getElementById('motor-select').addEventListener('change', e => {
+        state.modelId = e.target.value;
+        resetToStd();
+      });
+
+      document.querySelectorAll('.pass-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.passMode = btn.dataset.pass;
+          renderAll();
+        });
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.tab = btn.dataset.tab;
+          renderAll();
+        });
+      });
+
+      document.querySelectorAll('.spin-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.key;
+          const dir = Number(btn.dataset.dir);
+          const cfg = STEP_CFG[key];
+          const stateKey = key === 'pass' ? 'passWeight' : key;
+          let next = Number(state[stateKey]) + dir * cfg.step;
+          next = Math.min(cfg.max, Math.max(cfg.min, Number(next.toFixed(1))));
+          state[stateKey] = next;
+          if (cfg.custom) document.getElementById('preset-select').value = 'custom';
+          syncInputs();
+          renderAll();
+        });
+      });
+
+      Object.entries(STEP_CFG).forEach(([key, cfg]) => {
+        const el = document.getElementById(cfg.el);
+        el.addEventListener('input', () => {
+          const v = parseFloat(el.value);
+          if (!isNaN(v)) {
+            const stateKey = key === 'pass' ? 'passWeight' : key;
+            state[stateKey] = Math.min(cfg.max, Math.max(cfg.min, v));
+            if (cfg.custom) document.getElementById('preset-select').value = 'custom';
+            renderAll();
+          }
+        });
+      });
+
+      document.getElementById('preset-select').addEventListener('change', e => applyPreset(e.target.value));
+      document.getElementById('btn-reset').addEventListener('click', resetToStd);
+      window.addEventListener('resize', renderAll);
+    }
+
+    populateMotors();
+    bindEvents();
+    syncInputs();
+    renderAll();
+  </script>
+</body>
+</html>
